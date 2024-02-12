@@ -231,3 +231,142 @@ Conhecemos um projeto real que vamos refatorar
 Aprendemos o que é refatoração
 Vimos que testes são um passo muito importante na hora de refatorar
 Entendemos que ao refatorar, devemos dar pequenos passos
+
+#### 12/02/2024
+
+@02-Métodos
+
+@@01
+Projeto da aula anterior
+
+Caso queira, você pode baixar aqui o projeto do curso no ponto em que paramos na aula anterior.
+
+https://github.com/alura-cursos/google-crawler/archive/refs/tags/aula-1.zip
+
+@@02
+Extrair método
+
+[00:00] E aí, pessoal? Bem-vindos de volta a mais um capítulo deste treinamento, onde vamos começar a brincar com refatorações usando PHP como linguagem. Como eu falei, esse é um projeto real e projetos reais têm problemas de código. Vamos dar uma olhada aqui, em algum problema que identificamos, e como podemos melhorar pelo menos um pouco. Então esse método getResults, nós já vemos de cara que ele está meio grande.
+[00:23] Além de ele estar grande, ele faz muitas coisas. Primeiro ele verifica se esse googleDomain é válido, é algo que faz sentido, que está dentro do padrão. Ou seja, começa com google.com.
+
+[00:36] A partir disso, ele monta a URL, chama o método que faz isso, ele pega a resposta, usando o nosso proxy. A partir desta resposta, ele busca a lista de resultados, monta uma lista de resultados e, a partir disso, ele monta aquela googleResultList, ele atribui e insere todos os resultados, fazendo o parse nessa nossa lista de resultados.
+
+[00:58] Então, o que acontece? Temos bastante coisa acontecendo aqui e podemos começar a quebrar cada uma dessas partes. Uma refatoração muito comum é pegar um pedaço de código, que faz alguma coisa e que é normalmente repetido em outros lugares, e separar ele em um método específico.
+
+[01:16] No nosso caso, não temos essa repetição de código, mas algo assim é muito comum, termos a repetição, dois métodos que chamam duas, três linhas em comum. É muito comum pegarmos essas duas, três linhas, e extrairmos para um método específico. No nosso caso, eu vou extrair isso.
+
+[01:34] Esse pedaço de código $googleResultlist. Por quê? Ele tenta buscar os resultados do Google e isso pode mudar frequentemente. Se o Google mudar um CSS deles, eu preciso alterar esse método. Então eu vou deixar essa parte em um lugar separado, para não mexer nesse método grande. Além disso, ele faz uma verificação, pode lançar uma exceção. Então sendo assim, isso não é um algoritmo que eu julgo digno de virar um método próprio.
+
+[01:58] Dessa forma vamos extrair esse método. Se você está utilizando o PhpStorm, você pode fazer o "Ctrl + Alt + M", ou no Mac "Command + Option + M". Aqui ele já vai realizar essa refatoração de extrair método. Só que eu não vou utilizar a IDE aqui, para fazermos de forma manual. Eu vou pegar, copiar esse código, e fazer com que $googleResultList = seja igual a um novo método, que é a =$this->$googleCreateList).
+
+[02:28] Eu sei que esse método vai precisar desse ($domCrawler). Com esse domCrawler em mãos, podemos criar esse novo método.
+
+[02:40] E aqui eu vou chamar de private function createGoogleResultList(). Ele espera um (DomCrawler $domCrawler). Ele executa esse código e, no final, retorna esse return $googleResultList. Qual é o retorno desse filterXPath? Isso é um crawler. Então vamos devolver esse crawler, só que é um DomCrawler que ele retorna, porque eu estou utilizando aquele alias.
+
+[03:08] Só para você entender do que eu estou falando, de alias, a minha classe se chama Crawler e temos uma classe que se chama também Crawler, de um componente externo, então demos um apelido para ela, de DomCrawler.
+
+[03:20] Por isso ela está retornando esse tipo DomCrawler. Então ela recebe um crawler, busca alguma coisa e retornar um novo crawler só desses elementos.
+
+[03:30] Caso você não esteja entendendo muito bem essa parte de fazer web scraping, tem um treinamento de web scraping aqui na Alura, talvez isso fique mais claro. Mas aqui, tudo o que estamos fazendo é pegando esses elementos, filtrando eles e devolvendo um novo buscador de elementos, mas que já começa nesses elementos que nós buscamos. Basicamente é isso.
+
+[03:50] Agora o nosso método ficou um pouco menor, um pouco mais simples, ele agora cabe em uma tela só, por exemplo. Claro que a minha tela está muito ampliada, se fosse uma resolução normal ele já caberia antes, mas isso é um bom sinal, ele diminuiu de tamanho e fica um pouco mais fácil de ler.
+
+[04:05] Mas, obviamente, tem muito mais coisa para melhorar. Esse método ainda está grande, ainda tem bastante coisa nessa classe em si que dá para melhorar. Só que, de novo, lembra daquele detalhe de pequenas etapas quando estamos refatorando? Eu fiz uma refatoração. Foi uma refatoração pequena, foi um único processo que eu fiz, mas eu posso vir aqui e realizar os meus testes, phpunit, para garantir que tudo continue passando.
+
+[04:30] Talvez você esteja se perguntando: “Vinícius, normalmente os testes são rápidos, por que esses testes estão demorando tanto?” Porque eu tenho muitos testes de integração aqui, que vão ao Google, fazem a busca mesmo, fazem uma requisição HTTP para fazer esse parse de resultados, por isso está demorando um tempo.
+
+[04:45] Mas, entendido esse processo, vamos avançar nesse nosso estudo de extração de métodos, de catálogos, de refatorações. O que mais podemos mexer nesse código para deixar esse ele melhor?
+
+@@03
+Namespace alias
+
+No código deste projeto nós temos um alias da classe Crawler de um componente externo para DomCrawler.
+Qual a utilidade deste alias no código do projeto?
+
+Não há motivo real para ter isso ter sido feito
+ 
+Alternativa correta
+Renomear uma classe para seu nome fazer mais sentido
+ 
+Alternativa errada! Não é esse o motivo de termos um alias no projeto.
+Alternativa correta
+Evitar conflito com a classe Crawler do próprio projeto
+ 
+Alternativa correta! O projeto possui uma classe Crawler e um componente externo que ele usa possui uma classe com mesmo nome. Através de Namespace Alias nós conseguimos usar ambas sem conflitos.
+
+@@04
+Internalizar método
+
+[00:00] E aí, pessoal? Bem-vindos de volta. No último vídeo nós refatoramos o método getResults para que no momento de criar essa lista de resultados, isso fosse feito por um outro método, um método separado. Você já deve ter percebido que essa classe tem vários métodos separados para fazer essas pequenas tarefas. Vamos dar uma olhada na parte que faz o parse de um elemento do dom para transformar ele em um resultado realmente.
+[00:24] Nesse método aqui, nós fazemos isso, nós parseamos, e tem algumas tarefas que ele faz. Primeiro ele pega o link desse resultado do Google, verifica se é válido. Depois do link, ele pega a descrição desse elemento e verifica se é válido. Antes de continuar, antes de realmente retornar esse resultado do Google, verificamos se é uma sugestão de imagem, porque se for, não vamos colocar isso nos nossos resultados.
+
+[00:48] Porque essa biblioteca aqui, esse código, esse crawler, ele só se interessa nos sites e não nas sugestões de imagens. Se for uma sugestão de imagem, não vamos adicionar esse resultado. Mas repare que aqui nós já estávamos em um método, entramos em outro método e vamos para outro método, que não tem um código muito complexo, ele não tem muito algoritmo para ser realizado.
+
+[01:12] Então assim como temos uma refatoração de extrair método, que foi o que fizemos no último vídeo, existe uma refatoração que é incorporar método, que é exatamente o contrário, é pegar um método e trazer ele para dentro do método que chama, porque ele não é utilizado em outros lugares, ele não tem uma complexidade muito grande, então não é justificado ele estar separado.
+
+[01:34] O que vamos fazer? Em isImageSuggestion, nós já sabemos que ele é chamado em um lugar só. Por quê? Aqui, no PHP Storm, se eu dou um "Ctrl" e clique, ele já vai direto para o local, ou seja, só aqui ele é chamado. Então o que eu vou fazer é copiar o código dele, que eu sei que é isso, se isso é maior que 0.
+
+[01:52] Vamos lá, fazer por pequenas etapas primeiro, que é aquele processo. Ao invés de copiar esse código e já internalizar, eu vou refatorar esse código aqui. Eu vou fazer com que ele esteja em uma linha só, para que eu já retorne se o count() > 0. Pronto, já retornou, me livrei de uma linha. Primeira etapa.
+
+[02:12] Aqui eu precisaria rodar os testes para garantir que tudo continua funcionando, mas eu vou poupar esse tempo, já que temos muitos testes de integração. Vou pegar essa linha return $resultCrawler, vou copiar, remover esse método e trazer para cá. Vou no if ($this->isImageSuggestion e colar.
+
+[02:30] A partir do resultCrawler, ele está fazendo um filtro, verificando se tem uma imagem lá dentro. Se tiver alguma imagem, ou seja, se a contagem de imagens for maior que 0, eu sei que isso é uma sugestão de imagem, então não vou entrar neste detalhe. Repare que o código está simples, eu não prejudique a leitura, porque aqui está bem claro.
+
+[02:48] Além de ter uma descrição na exceção que eu estou lançando, a própria linha de código é bastante clara: se tiver alguma imagem nesse meu resultado, nesse elemento de resultado, significa que eu não quero adicionar esse resultado na minha lista. Então nós fizemos o que é conhecido como internalizar método, que é o contrário de extrair o método, em inglês é method inline ou inline method.
+
+[03:13] Então pegamos um pedaço de código, que só é utilizado em um lugar e não é muito útil ter ele em um lugar diferente, ou seja, o algoritmo não é complexo, ter um nome por ter um método assim não ajuda tanto, porque às vezes, se temos um algoritmo complexo, é interessante fazer aquela refatoração de extrair método, só para ter um nome ali.
+
+[03:35] Eu sei que esse pedaço de código faz isso, porque tem um nome, o método tem um nome, já o bloco de código não. Sendo assim, se temos um método que só tem uma linha de código ou tem um algoritmo muito simples, e o nome dele não ajuda tanto na legibilidade, como era o caso aqui, podemos fazer esse method inline ou inline method.
+
+[03:53] Claro que isso é relativo, às vezes refatorações podem acabar causando uma maior complexidade no código, na leitura, então eu vou deixar para você avaliar: você preferia com o método isImageSuggestion ou você prefere agora, sem um método extra, para precisarmos ficar dando "Ctrl" e clique para ver o que ele faz?
+
+[04:12] Você vai decidir se mantém essa refatoração ou não. Mas aqui nós conhecemos um novo tipo de refatoração, que é fazer inline de um método.
+
+@@05
+Extrair variável
+
+[00:00] E aí, pessoal? Bem-vindos de volta. No último vídeo nós vimos que normalmente técnicas de refatoração tem sua contraparte. Eu posso extrair um método, caso isso facilite a leitura, ou eu posso incluir um método, incorporar um método, fazer um inline de um método, se isso não for dificultar a leitura, se isso não for transformar o nosso código em uma confusão.
+[00:22] Só que nem só de métodos vive a programação, então o que vamos fazer agora é começar a trabalhar com variáveis. O que acontece? Nós incorporamos esse método if ($resultCrawler->filterXPath, que é uma única linha, e esse método só existia para dar um nome a essa linha.
+
+[00:37] Então, o que podemos fazer? Ao invés de ter um método, que está em outro pedaço de código, nós precisaríamos ir lá, no caso de uma IDE, fazer um "Ctrl + click" e clique para navegar para outro lugar, eu posso fazer isso: eu vou extrair isso para uma variável ao invés de um método, que o código ficará aqui mesmo. Eu vou copiar e criar uma $isImageSuggestion e colei aqui.
+
+[00:59] Agora, nesse if, ao invés de ter esse código, eu posso utilizar um nome. Repare que eu estou verificando se é uma sugestão de imagem, mas eu não preciso ir em um outro método para saber que é isso o que essa linha de código faz.
+
+[01:11] Então, essa ideia de extrair uma variável, é simplesmente pegar um pedaço de código, uma linha um pouco mais complexa, e dar um nome para ela. Só que para eu dar um nome para essa linha, eu não preciso de um método, eu simplesmente extraio uma variável. Agora que já estamos começando a ficar familiarizados com essas técnicas, eu vou dar alguns "Ctrl + Z" aqui para começarmos a utilizar a IDE ao nosso favor.
+
+[01:35] Eu estou utilizando o PHP Storm, mas outras IDEs tem outros atalhos, tem outras formas de você refatorar. Eu vou selecionar esse mesmo pedaço de código e eu tenho duas opções: eu posso vir com o botão direito, em refatorar e introduzir variável, ou seja, eu vou transformar isso em uma variável, eu posso fazer isso aqui.
+
+[01:55] Ou, "Ctrl + Z" de novo, eu posso fazer "Ctrl + Alt + V", ou "Command + Option + V" no Mac. O que isso vai fazer? Vai introduzir uma nova variável, pega esse código e extrai para uma variável. Eu vou chamar ela de isImageSuggestion, simples assim.
+
+[02:12] Dessa forma, de novo, eu pego um pedaço de código, que é uma linha, um algoritmo simples, dou um nome para ele, sem precisar criar um novo método. Essa é a funcionalidade de extrair uma variável ou introduzir uma variável no nosso código.
+
+@@06
+Nova variável
+
+Neste vídeo a refatoração foi bastante simples. Criamos uma nova variável com a expressão que estava sendo avaliada pelo if
+Por que nós criamos uma nova variável neste vídeo?
+
+Para que o valor analisado pelo if seja alterado pelo usuário
+ 
+Alternativa correta
+Para que aquela expressão tivesse um nome facilmente legível
+ 
+Alternativa correta! É muito mais fácil nós lermos um único nome do que uma expressão completa. Esse é o propósito dessa refatoração que fizemos.
+Alternativa correta
+Para otimizar a performance do if
+
+@@07
+Faça como eu fiz
+
+Chegou a hora de você seguir todos os passos realizados por mim durante esta aula. Caso já tenha feito, excelente. Se ainda não, é importante que você execute o que foi visto nos vídeos para poder continuar com a próxima aula.
+
+Continue com os seus estudos, e se houver dúvidas, não hesite em recorrer ao nosso fórum!
+
+@@08
+O que aprendemos?
+
+Nesta aula:
+Começamos a refatorar um projeto do mundo real
+Aprendemos a extrair métodos
+Vimos como e quando podemos internalizar códigos de métodos
+Entendemos que uma simples variável po
