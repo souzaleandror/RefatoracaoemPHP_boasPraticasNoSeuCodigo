@@ -370,3 +370,152 @@ Começamos a refatorar um projeto do mundo real
 Aprendemos a extrair métodos
 Vimos como e quando podemos internalizar códigos de métodos
 Entendemos que uma simples variável po
+
+#### 13/02/2024
+
+@03-Variáveis
+
+@@01
+Projeto da aula anterior
+
+Caso queira, você pode baixar aqui o projeto do curso no ponto em que paramos na aula anterior.
+
+https://github.com/alura-cursos/google-crawler/archive/refs/tags/aula-2.zip
+
+@@02
+Incorporar variável
+
+[00:00] E aí, pessoal? Bem-vindos de volta. Como nós começamos a falar um pouco de variáveis no vídeo anterior, no final do capítulo anterior, vamos continuar nesse assunto. Vamos ver quando usamos um método, quando usamos uma variável, enfim. Eu tenho aqui uma Google URL, ou uma URL do Google, que está sendo montada a partir de um método.
+[00:19] Repare que eu preciso passar três parâmetros para esse método, todos esses parâmetros que eu já tenho acessíveis aqui, e quando eu vou lá dentro, esse $domain = $googleDomain nós já sabemos que não precisa, eu já poderia trazer direto para cá, então quebra uma linha.
+
+[00:35] Este return $url, se usássemos lá direto, também não precisaria. Então, na prática, temos a inicialização de uma variável e um if. De novo, esse método não nos traz tanta vantagem, então podemos, mais uma vez, fazer aquela ideia de incorporar um método. Nós vamos substituir um método por uma variável. Vamos lá, vamos pegar esse código, deixa eu dar um "Ctrl + click" no getGoogleUrl, vou trazer ele para cá. Só que eu vou renomear, ao invés de $url, eu vou chamar de $googleUrl.
+
+[01:13] Então eu peguei aquele método que não fazia muita coisa, aquele método que não tinha uma lógica muito complicada, e trouxe para cá. E o que eu estou fazendo aqui? Eu estou substituindo um método por uma variável, simples assim. Porque, dessa forma, eu deixo o código mais claro, direto aqui no método que utiliza essa URL. Aquele nosso método getGoogleUrl, ele não é mais usado em lugar nenhum.
+
+[01:36] Então era um método bastante simples, que precisava de muitos parâmetros para ser chamado em um lugar só. Nesse caso, podemos facilmente remover esse método e diminuir o tamanho da nossa classe como um todo. De novo, esse método getResults ainda pode ser muito melhorado, mas ele está com uma cara um pouco mais interessante, onde faz sentido, onde temos exceções sendo lançadas e, nós temos um método a parte.
+
+[02:02] Nós estamos delegando parte da responsabilidade para outras classes, mas onde faz sentido, onde podemos, nós estamos utilizando direto aqui, estamos incorporando. Então estamos diminuindo o número total de métodos da nossa classe, sem aumentar muito o tamanho de um método só. Nessa conversa de quando utilizar a variável, quando utilizar método, podemos acabar entrando muito em opiniões.
+
+[02:26] No próximo vídeo nós vamos bater um papo sobre quando faz sentido fazer isso, e também o que eu fiz no último vídeo, que foi incorporar essa variável. Então quando faz sentido incorporar uma variável ou quando faz sentido fazer aquilo que eu fiz no primeiro vídeo, de extrair um método separado. No próximo vídeo vamos falar isso, quando usar método e quando usar variável.
+
+@@03
+Variável vs Método
+
+[00:00] E aí, pessoal? Bem-vindos de volta. No último vídeo fizemos uma refatoração, se você se lembrar bem, essa refatoração que nós fizemos, nós já conhecemos como inline method, ou incorporar método. Já no vídeo anterior, nós tínhamos aplicado uma refatoração que se chama extrair variável.
+[00:21] Nós temos um algoritmo e extraímos para uma variável. Só que antes disso, nós tínhamos feito um inline de um método também, então às vezes precisamos extrair uma parte de código, às vezes precisamos fazer um inline de uma parte de código. Então quando fazemos isso?
+
+[00:36] E nesse cenário, nós acabamos trocando a chamada de um método por uma variável. Quando faz sentido ter um, quando faz sentido ter outro? No nosso caso, nós temos uma classe relativamente grande, então ela pode diminuir, inclusive talvez falemos mais sobre isso, sobre diminuir essa classe. Ela tem muitos métodos, repare quantos métodos ela tem.
+
+[00:57] Então, nesse cenário, talvez diminuir o número de métodos seja uma coisa boa, porque temos menos indireções, que é o que conhecemos. Uma indireção é quando eu chamo um método, esse método chama outro e esse método chama outro. Então eu tenho várias indireções, eu tenho várias chamadas de outros métodos para realizar o trabalho.
+
+[01:19] Então quando eu tenho uma classe um pouco complexa como essa, se eu posso diminuir o número de indireções, isso pode ser vantajoso, desde que o algoritmo seja simples, que esse algoritmo faça parte dessa classe mesmo e não seja uma coisa que eu deva extrair para outra classe, por exemplo, enfim.
+
+[01:37] Nesse cenário, onde simplesmente estávamos montando a URL do Google, repare que isso é uma coisa que não vai mudar. O Google não vai mudar a forma de montar uma URL, a rota do Google, de search, não vai mudar sempre. Então isso eu não preciso botar para o método separado, para um local separado, e eu não tenho um algoritmo complexo, eu só tenho um if para garantir.
+
+[01:59] Se eu tiver informado o $countryCode, se eu tenho o código do país, eu vou adicionar ele como um outro parâmetro na nossa URL, e só, é simples, é um código simples. Agora, nesse cenário de criar o resultado do Google, nós tínhamos uma verificação que lançava uma exceção, talvez isso possa ser extraído, porque aqui já temos um código que pode ser alterado com mais facilidade, tem esse detalhe.
+
+[02:28] Isso aqui, inclusive, já mudou muito, muitas vezes. Essa classe, que representa o resultado do Google, muda frequentemente. Esse é um código que será bastante alterado, então é bom isolar ele, é um código que lança uma exceção, dependendo de determinados casos. Talvez, às vezes, queremos alterar a mensagem dessa exceção, inclusive eu acho que tem até um erro aqui de escrita.
+
+[02:50] É "parsable" e não "parseable". Repare que é um código que vamos alterar mais vezes, então é interessante isolar ele em um lugar, em um local específico. Eu ainda acho que esse pedaço de código faz sentido estar dentro dessa classe de crawler, porque ele manipula diretamente o dom, ele manipula diretamente o HTML do Google. Então ele faz parte, é responsabilidade de um crawler fazer isso.
+
+[03:16] Então eu acho que esse método está na classe certa, só que eu acho que ele deve ser um método separado por causa desses detalhes. É um algoritmo que eu posso ter modificações sempre, eu posso, às vezes, querer mudar o tipo dessa exceção, criar uma exceção mais específica. É um algoritmo que pode mudar mais vezes, então eu extraí ele.
+
+[03:36] Agora, nesse cenário de isImageResult, eu sei que um detalhe, uma linha de código que não precisa de verificação nenhuma, não estou fazendo nada além de simplesmente pegar esse resultado e ver se existe.
+
+[03:49] Então, claro, se a partir de algum momento a forma de identificarmos se é uma imagem ou não começar a mudar, extrair isso para um método pode fazer sentido. Repare que nem sempre as coisas são tão objetivas, e para podermos decidir que tipo de refatoração implementar, nós precisamos examinar qual é o problema.
+
+[04:09] Não vamos simplesmente olhar para a nossa classe ou para um método e pensar: “poxa, vou melhorar isso aqui, vou sair modificando sem pensar muito bem”. Nós precisamos identificar problemas e, a partir desses problemas, nós sabemos qual técnica de refatoração implementar. Nós vamos falar bem mais sobre um catálogo de técnicas de refatoração no final do treinamento.
+
+[04:30] Mas, por enquanto, é importante entendermos que estamos conhecendo essas técnicas, incorporar método ou extrair método, incorporar, extrair uma variável, ou incorporar o método como uma variável. Nós estamos começando a conhecer as técnicas e no final do treinamento, vamos entender como identificar um problema e, a partir desse problema, saber usar a técnica adequada.
+
+[04:53] Mas já falei bastante, vamos voltar a refatorar, vamos voltar a botar a mão em código. Por exemplo, será que essa variável $googleResult é necessária? Será que eu preciso dela? Quando faz sentido ter uma variável, modificar uma variável? Quando criar uma outra? Enfim, vamos continuar falando de variáveis no próximo vídeo.
+
+@@04
+Quando usar cada?
+
+Tivemos uma discussão interessante sobre quando extrair um método ou quando apenas introduzir uma nova variável.
+Em que cenário é mais vantajoso nós extrairmos um método?
+
+Quando a expressão que queremos nomear é simples
+ 
+Alternativa correta
+Quando o algoritmo que queremos nomear é complexo
+ 
+Alternativa correta! Às vezes nós queremos dar nome a um pedaço de código que executa um algoritmo um pouco mais complexo. Talvez ele lance uma exceção, talvez seja suscetível a mudanças. Nesses cenários, extrair um método pode ser mais vantajoso.
+Alternativa correta
+Sempre que queremos dar nome a um pedaço de código
+ 
+Alternativa errada! Às vezes simplesmente introduzir uma variável já é o suficiente.
+
+@@05
+Quebrar variáveis temporárias
+
+[00:00] E aí, pessoal? Bem-vindos de volta. Como eu comentei no último vídeo, será que essa variável é necessária? Será que ela está ajudando em alguma coisa? Ela traz algum valor, para essa variável, logo depois retornar?
+[00:12] Às vezes, e é bastante comum, temos uma variável só para usar ela uma única vez na linha seguinte, para ter algum nome, mas nem sempre isso é necessário. Por exemplo, aqui eu tenho uma variável temporária, ela não é usada depois, ela é realmente temporária e o direta retorna ela.
+
+[00:27] Então, nesses cenários onde eu tenho uma variável só para usar na linha seguinte e depois não utilizar mais, ela é temporária no sentido de que eu só vou utilizar ela uma vez, para um detalhe específico, e o código que foi utilizado para gerar o valor dela não é complexo, podemos fazer o que é conhecido como inline de variáveis temporárias ou inline temporary variables.
+
+[00:49] Vamos incorporar direto no código o que seria essa variável, vamos direto utilizar esses algoritmos. Às vezes nós temos, por exemplo, aqui na linha 134, nós extraímos uma variável temporária.
+
+[01:02] Então essa é a contraparte dessa refatoração. Às vezes, se isso fosse um código um pouco mais simples, que não precisasse do nome, eu poderia, ao invés de ter a variável, simplesmente utilizar esse código diretamente no if. Repare que a maioria das técnicas de refatoração possui uma contraparte.
+
+[01:20] Eu posso extrair algo, posso fazer um inline de algo, posso criar uma variável temporária ou posso me livrar de uma variável temporária, então a maioria das técnicas de refatoração possui contraparte. Mas como essa foi bem simples, vamos procurar um outro lugar para refatorarmos, vamos ver esse tal de proxy.
+
+[01:38] Vamos ver no nosso NoProxy, o que mais estamos utilizando, e esse método está me incomodando bastante. O que esse método faz? Ele é bem chato de entender, porque as funções são complicadas.
+
+[01:49] Ele pega uma URL e a separa em partes de URL. Repare que até precisamos de um comentário aqui. Talvez link não seja o melhor nome, talvez chamássemos isso de partes da URL. Então vamos lá, vamos renomear essa variável, $urlParts ou alguma coisa do tipo, podemos até achar algum nome melhor talvez. Só que o que acontece.
+
+[02:13] Eu estou utilizando essas partes de URL, ou seja, eu estou separando as partes de URL, não preciso mais do comentário, e dessas partes de URL eu estou pegando a query string e dessa query string eu estou fazendo um outro parse. Por que, o que acontece? Deixa eu abrir o terminal.
+
+[02:29] O resultado do Google, ele retorna mais ou menos assim: "google.com/algumacoisa", alguma coisa que eu não me lembro o que é, e temos na query string, o "q=" e temos a URL do nosso resultado. Por exemplo, se o resultado for o "dias.dev", imagine que é o meu blog, que buscamos pelo meu blog.
+
+[02:49] Essa é a URL do resultado do Google, porque o resultado do Google não tem o link do site direto, ele tem um site do próprio Google, que ele analisa algumas métricas, antes de retornar para os sites corretos. Então o que eu estou fazendo aqui é com essa primeira linha, eu separo essa URL em domínio, em caminho ou path, e na nossa query string.
+
+[03:17] Então ele vai pegar esses detalhes de query string. Pode ter esse "q=" que tem a URL, e pode ter outras coisas, não sei, "temp=algumacoisa", "etc=outra", então ele pode ter vários parâmetros aqui. A partir desses vários parâmetros que eu posso pegar dessa query, eu estou fazendo o parse string. O que esse parse string faz?
+
+[03:39] A partir de uma URL, que tenha esse formato que é um valor igual a outra coisa separado por "&", então valor outra coisa, "&", uma valor, um parâmetro, uma chave, valor, "&", chave, valor, "&", ele pega isso e separa em um array. Então essas não serão mais as partes da URL. Eu tenho uma variável e depois eu estou sobrescrevendo ela aqui.
+
+[04:06] Repare que está difícil, está um código complexo. Deixa eu fechar o terminal. Então isso aqui agora irá conter o nosso link. Como podemos chamar essa variável? Nós vamos criar uma outra variável aqui. Vou apertar aqui, no PHP Storm, utilizando o Mac eu vou apertar o "Ctrl + G", que ele irá selecionar essa duas $urlParts, e eu vou dar um novo nome, porque eu não estou gostando disso.
+
+[04:30] Eu vou chamar de $queryStringParams, porque eu peguei as partes da minha URL do Google. Eu pego essas partes da URL e faço o parse para pegar as query strings, os parâmetros da query string. Então não preciso mais desse comentário também.
+
+[04:52] Agora eu pego a URL a partir do parâmetro ['q'] dessa query string. Então a minha query string, como eu mostrei na URL do Google, ela tem um parâmetro "q" e lá tem a URL. Eu estou fazendo a verificação, então aqui eu não preciso desse comentário também, porque essa verificação está mais clara.
+
+[Aula3_video3_imagem3]
+
+[05:08] Então o que eu fiz aqui? Eu estou introduzindo uma nova variável para não utilizar somente variáveis temporárias, que era aquele link. Só que, antes disso, eu renomeei uma variável, que também é algo que não faz parte de um catálogo de refatorações, mas é uma técnica muito válida, mudar o nome de uma variável para que ela faça mais sentido, para que ela tenha um significado um pouco mais correto.
+
+[05:31] Então aqui, como eu mudei bastante coisa, vou rodar junto com vocês o nosso teste, os nossos testes. Mas, enquanto isso, vamos recapitular o que eu fiz. Eu primeiro renomeei a variável, para invés de ser link, o que não quer dizer muita coisa, eu chamei de $urlParts, ou partes da URL.
+
+[05:48] Dessas partes da URL, eu pego a query string e faço um parse de string. Isso é uma função do PHP. Esse parse de string pega aquela chave e valor, separados por "&", e transforma em um array. Então eu terei aqui os parâmetros da query string, os query strings parameters. Eu pego o parâmetro "q" e verifico, eu garanto que é uma URL.
+
+[06:13] Então se eu consigo pegar essa URL, eu retorno ela. Os nossos testes continuam passando. E esse código, que continua complexo, mas porque a utilização dessas funções é complexa, mas agora, esse código que é complexo, está um pouco mais legível. Sem comentários eu consigo bater o olho nesse código e, com um pouco de esforço, ainda consigo entender o que ele faz.
+
+[06:34] Então aqui nós vimos mais de uma técnica. Nós vimos a inclusão de variáveis, para não ficarmos sobrescrevendo a mesma variável, e vimos também renomear variáveis. Nós não estamos colocando qualquer nome em uma variável, mas sim utilizando um nome que faça sentido.
+
+[06:57] Então aqui foram algumas técnicas, por isso eu rodei o teste aqui, junto com você, mas eu quero que você pare, faça os exercícios e reflita sobre o que vimos aqui, e pense se dá para aplicar algum outro tipo de refatoração. Já te adianto que sim, tem outra refatoração que podemos aplicar, mas talvez o código não fique mais limpo.
+
+@@06
+Para saber mais: Funções usadas
+
+Neste vídeo nós usamos 2 funções relativamente complexas de entender, então pra garantir que você compreendeu bem o código, vale a pena dar uma conferida na documentação oficial dessas 2 funções.
+Aqui estão:
+
+https://php.net/parse_url
+https://php.net/parse_str
+
+@@07
+Faça como eu fiz
+
+Chegou a hora de você seguir todos os passos realizados por mim durante esta aula. Caso já tenha feito, excelente. Se ainda não, é importante que você execute o que foi visto nos vídeos para poder continuar com a pr
+
+Continue com os seus estudos, e se houver dúvidas, não hesite em recorrer ao nosso fórum!
+
+@@08
+O que aprendemos?
+
+Nesta aula:
+Aprendemos que nem sempre um método separado é necessário
+Conversamos sobre quando usar métodos ou variáveis
+Aprendemos que não devemos reutilizar variáveis
+
