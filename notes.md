@@ -519,3 +519,200 @@ Aprendemos que nem sempre um método separado é necessário
 Conversamos sobre quando usar métodos ou variáveis
 Aprendemos que não devemos reutilizar variáveis
 
+#### 14/02/2024
+
+@04-Substituindo Algoritmo
+
+@@01
+Projeto da aula anterior
+
+Caso queira, você pode baixar aqui o projeto do curso no ponto em que paramos na aula anterior.
+
+https://github.com/alura-cursos/google-crawler/archive/refs/tags/aula-3.zip
+
+@@02
+Remover atribuição a parâmetro
+
+[00:00] E aí, pessoal? Bem-vindos de volta a mais um capítulo deste treinamento onde estamos conhecendo algumas técnicas de refatoração. Claro, primeiro tivemos que entender o que é essa tal de refatoração, e estamos fazendo isso em um projeto real, por isso tem bastante coisa para melhorar e, mesmo no final do curso, terá bastante coisa para melhorar ainda. Mas vamos lá, vamos direto ao ponto.
+[00:18] Esse código da última aula está pequeno, mas eu quero apontar um problema que pode acontecer em códigos maiores. Nós recebemos um parâmetro chamado $url e depois sobrescrevemos esse parâmetro com outro valor, nós utilizamos esse mesmo nome para criar uma variável. Isso pode gerar um problema grande, porque aqui, nesse cenário, estamos fazendo essa sobrescrita, estamos modificando esse valor e retornando ele logo depois.
+
+[00:45] Só que se fosse um cenário onde tivéssemos esse código aqui, o que acontece? A partir desse momento, ainda mais em um código grande, que infelizmente é comum no mundo real, nós não sabemos se o valor que recebemos por parâmetro, continua sendo o original.
+
+[01:00] Nós modificamos e isso torna o nosso código mais frágil, porque podemos precisar do parâmetro de novo, nós não temos mais, podemos acabar utilizando esse valor dessa variável achando que é o parâmetro original, mas, na verdade, ele foi modificado. E pior, no nosso cenário, nós recebemos uma URL e estamos substituindo ele por algo que é realmente uma URL.
+
+[01:23] Então, nesse cenário, podemos acabar realizando manipulações que fazem sentido, que vão funcionar, só que o código não será o esperado, talvez tenhamos um cenário do nosso teste passando, mas mesmo assim, o código não estará correto, não funcionará. Essa é uma técnica muito perigosa, a de substituir o valor de um parâmetro.
+
+[01:41] Então o que faremos aqui é simplesmente renomear essa variável. Ao invés de utilizar essa variável, nós daremos um novo nome específico para ela, para não substituirmos o nosso parâmetro. Vamos lá, essa é a URL real do nosso resultado, então eu posso chamar de result URL ou alguma coisa do tipo, então $resultUrl.
+
+[02:03] Ou seja, isso é a URL do resultado e não a URL do Google. Inclusive eu posso vir aqui e modificar esse parâmetro $url também, renomear esse parâmetro para ser $googleUrl, porque eu sei que, opa, aqui nós temos alguns detalhes de outras classes. Deixa eu ver, onde ele está sendo usado. Acho que isso aqui ele está modificando em outras classes também. Então não vou renomear em outras classes, eu vou renomear só aqui.
+
+[02:32] Ele nos avisa que tem um detalhe, porque na interface que nós estamos implementando, o nome desse parâmetro é URL, já aqui mudamos $googleUrl. Então vamos fazer isso? Aqui, na interface, eu vou renomear também, para $googleUrl, vamos lá, "googleUrl". Só que eu não vou utilizar o rename do PHP Storm, senão ele vai fazer aquilo, ele vai querer renomear em todas as classes, então eu vou renomear só aqui, $googleUrl.
+
+[03:02] Depois, caso eu queira utilizar aqueles proxies, eu entro em cada um dos proxies e renomeio também para alterar, até porque esse código, nos proxies, é diferente, então eu precisaria dar uma olhada para ver o que precisa ser modificado. Mas, no nosso cenário, eu já estou bastante satisfeito.
+
+[03:17] Eu sei agora que eu recebo a URL do Google, eu pego as partes dessa URL, faço o parse da query string e, a partir dos parâmetros da query string, eu sei que no parâmetro "q" eu tenho o resultado, eu tenho a URL deste resultado. Agora, esse código, para mim, está suficientemente refatorado.
+
+[03:37] Eu acho que eu já cheguei em um ponto que eu consigo bater o olho nele, ler o código sem comentários e entender o que ele faz. Então aqui nós temos algumas técnicas sendo implementadas e a principal foi a primeira, que nós fizemos, que foi a de não reatribuir um valor a um parâmetro, ou parameter reassignment, se eu não me engano é esse o nome em inglês. Só que, além disso, nós também trabalhamos com renomear variáveis.
+
+[04:03] Então, recapitulando, a ideia é não reatribuirmos algum valor a um parâmetro, porque, de novo, isso pode confundir o código que vem depois. Nós podemos achar que estamos manipulando o parâmetro que nós recebemos, mas, na verdade, estamos manipulando uma variável que já foi atribuída, que foi substituída, e isso pode causar problemas silenciosos, que é o pior tipo de problema.
+
+[04:25] Então, nesse cenário, nós corrigimos esse problema simplesmente introduzindo uma nova variável. Agora, ao invés de utilizarmos direto a googleUrl, estamos utilizando a resultUrl, ou seja, introduzimos uma variável para resolver aquele problema, além de fazer algumas renomeações aqui, para deixar o código mais claro.
+
+@@03
+Para saber mais: Nome do parâmetro
+
+Quando nós renomeamos o parâmetro do método parseUrl o PHPStorm nos emitiu um alerta. Sempre que a IDE nos avisa de algo, significa que alguma melhoria pode ser feita, ou algum erro no futuro pode acontecer.
+Nesse caso, nós poderíamos ter um errinho bem chato nas versões mais novas do PHP que é explicado em detalhes aqui:
+
+Novidades do PHP 8 - Named Arguments | Dias de Dev
+
+https://www.youtube.com/watch?v=epla4NyobjU
+
+@@04
+Método por objeto-método
+
+[00:00] E aí, pessoal? Bem-vindos de volta. Nós começamos a mexer um pouco no algoritmo das coisas, mexendo em espaços um pouco maiores de código, não trocar uma linha por outra, um método por uma variável, mas sim mexer no geral. Por exemplo, não atribuir a variável.
+[00:15] Agora voltando aqui, falando em algoritmos, quando damos uma olhada na nossa classe de crawler, nós temos a parte de acessar o Google em si, pegar os resultados e tal, só que quando temos o elemento que representa um resultado, nós temos um código relativamente grande.
+
+[00:42] Então talvez seja interessante tirar esse algoritmo, que está maior, desta classe, porque se formos inclusive refatorar esse método, nós teremos um código bastante grande, teremos bastante trabalho para fazer. Este um algoritmo complexo dentro de uma classe que talvez ele não devesse estar.
+
+[01:02] Aqui já começamos a analisar a necessidade de uma classe especializada para essa tarefa, para fazer o parse de um elemento do dom. Aqui vamos criar uma classe chamada dom element parser, que fará o parse de um dom element. Vamos lá, vou fazer um "DomElementParser" e eu ainda não sei como eu vou implementar ela, porque eu vou copiar o código, mas eu sei que eu terei uma função, um método chamado public function parse.
+
+[01:31] Esse método, eu acredito que vai retornar um resultado, suponho eu que seja isso que ele retorna. Mas vamos nessa, vamos ver como isso é feito. Eu vou pegar esse código e eu já estou vendo que eu vou precisar de um outro método, o createResult. Vamos lá, deixa eu, na verdade, pegar só o corpo. Vou pegar o corpo do código.
+
+[01:51] Recortei e vamos colar o corpo dele. O PHP Storm já me ajuda, ele vai importar isso tudo para mim. Importou.
+
+[02:02] Aqui eu não preciso chamar de DomCrawler, eu posso chamar só de Crawler, porque eu não tenho outra classe com esse mesmo nome. Vamos nessa, eu preciso receber esse elemento, que é o Result. Vamos lá, public function parse(\DOMElement $result). E eu acho que é interessante renomearmos esse parâmetro, mas vamos com calma, chegaremos lá.
+
+[02:20] Vamos trazer agora esse método createResult. Vou recortar ele e vou trazer para cá, porque ele também será necessário aqui. Vamos receber esse DOMElement por parâmetro aqui e show de bola.
+
+[02:39] Teoricamente temos tudo o que precisamos, menos esse parseUrl, então vamos lá. Aqui, ele simplesmente chama o método de proxy. Deixa eu copiar isso e remover esse método. E aqui - eu nem preciso copiar, eu só terei um proxy também e vou chamar o método parseUrl.
+
+[03:02] Então eu sei que eu vou precisar do proxy, perfeito. Se eu preciso do proxy, vamos receber ele no construtor. E aqui, se eu estivesse usando o PHP 8, eu poderia fazer isso, (private GoogleProxyInterface $proxy).
+
+[03:16] No meu caso, aqui eu estou usando o PHP 8, então eu vou deixar essa sintaxe assim, para ser um pouco mais rápido, um pouco mais fácil. Eu já tenho aqui o nosso proxy, que tem o método parseUrl, então teoricamente esse método já está pronto, esse aqui está ok também.
+
+[03:31] Agora vamos corrigindo os problemas que criamos aqui. Vamos ver o que temos que fazer. Teoricamente aqui eu não preciso mudar nada, pelo menos por enquanto. Beleza, vamos no crawler e usar, ao invés de chamar a função, o método parseDomElement dessa classe, eu vou criar um parse, então $domElementParser.
+
+[03:54] $domElementParser = new DomElementParser(), aqui passando o ($this->proxy) por parâmetro, porque ele também precisa do proxy. Aqui, ao invés de chamar o parseDomElement, eu vou chamar o $domElementParser->parse.
+
+[04:06] Ou seja, eu estou fazendo o parse desse elemento, usando essa classe específica. Então nós tiramos muito código da nossa classe, código que podia ser extraído, para uma classe específica. Nós criamos uma classe que terá um método só para isso. Então o que fizemos foi substituir um método por um objeto que tem esse método.
+
+[04:26] Esse é o método dessa técnica, é a substituição de método por objeto método, ou método de objeto. Então pegamos o método da nossa classe, que realizava alguma função, alguma tarefa, só que essa tarefa estava complexa, podia ser difícil de refatorar dentro da própria classe, então extraímos ela para um outro local.
+
+[04:46] Um outro momento, onde é muito comum fazer esse tipo de tarefa, é quando - imagine que temos aqui ainda aquele dom element parser e neste método, ou nessa função, temos várias variáveis locais, que utilizamos em vários pontos do algoritmo, tornando difícil a extração de métodos específicos.
+
+[05:05] Então, nesse momento, também é muito comum extrairmos esse método para uma classe, para um objeto método, ou seja, para uma classe que terá esse método, que realiza essa ação específica. Nesse caso, acabamos tendo uma classe, um serviço bem específico, mas isso não é um problema, isso, na verdade, é uma vantagem, porque se ele é bem específico, ele tem uma única responsabilidade, ele inclusive é até um pouco mais fácil de testar.
+
+[05:29] Então poderíamos inclusive criar agora um teste para essa classe, para garantir que o parse de um elemento do dom de resultado é feito corretamente, de forma individual. Só que já estamos testando bastante a nossa classe crawler, então não vou criar testes novos aqui. A última coisa que eu vou fazer antes de rodar os nossos testes é que eu vou alterar $result para $resultDomElement.
+
+[05:57] Para mostrar, para deixar claro que isso é um elemento do dom que representa um resultado. Com isso tudo, eu posso rodar, no terminal, vendor/bin/phpunit e se tudo der certo e eu não fiz nenhuma besteira, os nossos códigos devem continuar passando, porque, de novo, eu não alterei nenhuma assinatura de método, eu não mudei o funcionamento de nada, eu só extraí um código.
+
+[06:17] Então está lá, deixa eu minimizar o terminal e deixa eu voltar para o nosso crawler. Nós tínhamos mais de 160 linhas quando começamos com esse projeto, agora já estamos com algo um pouco mais aceitável, já que é um número abaixo de 100. Então isso é um código muito mais aceitável para uma classe.
+
+[06:34] De novo, ainda dá para melhorarmos bastante esse método, que está grande, só que ele já está bem melhor do que antes. Como estamos falando dessa parte de algoritmos um pouco maior, essa parte maior de algoritmos, e não mudar uma variável, um método, vamos falar exatamente sobre isso, sobre mudar o algoritmo, a implementação de algo.
+
+[06:56] Como isso funciona? Porque em vários momentos nós lançamos exceção. Talvez pudéssemos ter uma outra forma de controlar o fluxo sem lançar a exceção. Enfim, vamos conversar bastante, com mais detalhes, no próximo vídeo.
+
+@@05
+Desvantagem
+
+Neste vídeo nós terminamos com uma classe a mais, bem coesa e focada em uma única tarefa, o que é um ótimo ponto. Mas praticamente todas as técnicas de refatoração possuem um ponto negativo.
+Qual a desvantagem de extrair um método para um objeto-método?
+
+A nova classe é muito específica, resolvendo só um problema.
+ 
+Alternativa errada! Isso é um ótimo sinal.
+Alternativa correta
+A nova classe está muito acoplada com a pré-existente.
+ 
+Alternativa errada! Isso é sim um problema, mas não é um problema inerente desta técnica de refatoração. Este código já estava acoplado antes, só não estava em uma classe.
+Alternativa correta
+Nós criamos uma nova classe, aumentando a complexidade geral do projeto.
+ 
+Alternativa correta! Antes o que era uma única classe, agora são 2. Isso significa que precisamos escrever mais testes, há mais pontos de falha, etc. Mas sem dúvida a flexibilidade também é maior. Sempre que falamos de qualidade de código, falamos de escolhas. Precisamos pesar as vantagens e desvantagens.
+
+@@06
+Substituir algoritmo
+
+[00:00] E aí, pessoal? Bem-vindos de volta. Como eu falei, agora estamos mexendo mais no algoritmo mesmo, em como fazemos as coisas. Uma coisa que me incomoda muito nesse código é de lançar uma exceção para simplesmente depois fazer um log dessa exceção.
+[00:17] Na verdade, eu nem preciso disso, eu só quero saber se é um resultado válido e, se não for, eu posso decidir fazer um log ou posso simplesmente ignorar, que é o que eu quero. Só que, neste caso, como eu estou lançando uma exceção para ignorar isso, eu preciso ter esse bloco de catch vazio e isso é muito feio.
+
+[00:34] Acredito que você concorda comigo. Então, o que eu quero fazer, é mudar, alterar o algoritmo de parse para que ele não lance exceções mais. Para o meu PHP Storm parar de reclamar, já que eu estou usando o PHP 8, eu vou informar para ele: eu estou usando o PHP 8, então essa sintaxe é válida.
+
+[00:53] Mas, vamos lá, continuando, o que eu quero fazer não é mais retornar um resultado ou lançar uma exceção. O que eu quero fazer é retornar algo que talvez tenha um resultado, talvez não tenha, pode ser nada, pode ser vazio. Então quando falamos desses talvez, quando temos esse tipo, essa palavra talvez, podemos fazer de duas formas.
+
+[01:14] Uma, a mais comum, é retornar nulo, por exemplo. Posso retornar aqui e simplesmente retornar nulo. Deixa eu inclusive selecionar todos os lugares que lançam essa exceção, que se não me engano são quatro aqui. Então eu posso vir aqui e simplesmente return null;. E aqui eu retorno o resultado válido. Dessa forma, no local onde eu recebo, eu posso verificar se não for nulo, if (!is_null(value: $parsedResult), então eu adiciono aqui.
+
+[01:53] Então essa é uma forma de resolver o problema e aqui eu já posso me livrar deste try catch. E posso trazer isso de volta para cá.
+
+[02:01] Então deixa eu rodar os testes e garantir que tudo continua funcionando, vendor/bin/phpunit, vamos garantir que eu não quebrei nada. Só que enquanto os testes vão rodando, eu quero chamar a sua atenção para esse detalhe aqui.
+
+[02:14] Eu preciso me lembrar de verificar se é nulo ou não. Perfeito, está tudo passando aqui. Ok, o PHP pelo menos nos informa que esse valor pode ser nulo, dessa forma já utilizando alguma IDE, ela vai me avisar que eu preciso verificar alguma coisa. Mas, mesmo assim, essa verificação é muito fácil de esquecer. Se eu tento simplesmente fazer isso aqui, repare que eu não recebo nenhum tipo de erro, nenhum tipo de aviso.
+
+[02:43] Isso é um grande problema. Então, o que eu quero fazer? Eu quero usar um tipo que significa exatamente isso: talvez tenha valor, talvez não tenha. Isso, no mundo da programação funcional, é conhecido como uma mônada, chamada maybe ou optional. Inclusive existem alguns conteúdos deste tema de programação funcional.
+
+[03:04] Aqui na Alura, temos um treinamento só sobre programação funcional com PHP, vale a pena dar uma olhada. E eu vou deixar no Para Saber Mais uma explicação um pouco mais resumida dessa mônada de optional ou maybe. Mas, vamos usar um pacote para nos ajudar com isso. Esse é o primeiro que eu encontrei “yitznewton/maybe-php”.
+
+[03:22] Não sei se é o melhor, mais performático, mas eu peguei o primeiro dessa lista e vamos instalar ele. Colei aqui no terminal e no meu caso, ele já está instalado. Instalado este pacote, o que vamos fazer? Nós não vamos mais retornar um resultado ou nulo, o que vamos fazer é retornar um Maybe, talvez tenha valor, talvez não tenha, vamos ver isso.
+
+[03:45] Então aqui eu posso retornar, ao invés de nulo, eu vou retornar um talvez que encapsula esse nulo. Deixa eu desfazer aqui e mexer em tudo de uma vez só. Vamos lá, aqui eu vou encapsular esse nulo com um new Maybe, ou seja, talvez tenha um valor aqui dentro.
+
+[04:02] Como eu estou passando o nulo, significa que não tem valor. Inclusive eu der uma olhada no código, repare que é isso o que ele faz, ele verifica se é alguma coisa ou não, através dessa verificação se é nulo.
+
+[04:15] Mas, não vamos entrar em detalhes no código da biblioteca, vamos continuar aqui. Eu não posso mais retornar o resultado diretamente, eu vou retornar um Maybe(), ou seja, talvez tenha um resultado ali dentro, mas talvez não. Agora, quando eu recebo isso, eu não posso adicionar um resultado de um maybe, de algo que pode estar lá. Então o que eu vou fazer?
+
+[04:38] Agora não é mais o resultado, é um talvez tenha um resultado, é uma mônada que pode existir um valor lá dentro ou não. Com isso, a partir dessa mônada, desse maybe, eu posso chamar um método chamado select(). Esse select será executado caso eu tenha valor.
+
+[04:46] Então aqui, neste valor, eu sei que eu tenho o result, então $parseResult, deixa eu fechar isso, e pronto. Ou seja, esse método select, faltou um parênteses e sobrou outro, agora sim.
+
+[05:10] Então esse select vai fazer o que? Ele executa essa função caso possua algum valor nessa mônada. Se não tiver nenhum valor lá, ele não faz nada. Essa função será executada só quando tiver algum valor lá. E ela recebe, por parâmetro, o valor. Então eu estou adicionando aqui o tipo, eu estou informando que isso é um resultado, e estou adicionando na minha lista de resultados, eu estou adicionando este resultado parseado.
+
+[05:35] Lembrando que isso é aquela sintaxe de short closures, ou arrow functions do PHP. Tem vídeo aqui na Alura+ sobre essa sintaxe, caso você não conheça. Mas, basicamente, isso aqui é uma função anônima, como já escrevíamos antigamente. Teoricamente está tudo certo e isso aqui, para mim, está muito mais claro.
+
+[05:53] Eu sei que mesmo que eu não conheça essa tal de mônada, eu sei que eu precisarei entender esse tipo e eu garanto que sempre, todo mundo que for utilizar esse método parse, será obrigado a verificar se o valor existe ou não. Eu não deixo a responsabilidade para o código que está usando, colocar ou não colocar o if.
+
+[06:11] Eu assumo a responsabilidade aqui, quando eu informo: eu posso te retornar o valor ou posso não retornar nada. Então, através dessa mônada maybe eu obrigo quem estiver utilizando este retorno, a verificar se o valor existe ou não, a pegar o valor de forma indiscriminada, mas assumindo a responsabilidade, enfim.
+
+[06:32] Teoricamente isso deve continuar funcionando, então vamos executar os testes. Enquanto os testes vão executando, o que eu fiz aqui foi basicamente substituir o algoritmo. Normalmente a substituição de algoritmo também não modifica a assinatura do método.
+
+[06:51] Ele não muda retorno, não muda os parâmetros, ele muda somente a implementação, isso é o mais comum. Só que, nesse cenário, eu achei justo, eu achei que fazia mais sentido mudar a interface desse método, mudar o que ele retorna, porque dessa forma eu garanto que quem usa ele usa de forma mais segura.
+
+[07:11] Então ao invés de retornar um resultado ou nulo, que o PHP me permitiria isso sem problema, eu estou utilizando um pacote a mais para garantir que quem buscar esse resultado, quem tentar parsear um resultado, sabe, com certeza, que pode não vir nada aqui. Dessa forma eu paro de usar exceções como controle de fluxo, o que é uma má prática, e eu vou deixar um Para Saber Mais aqui falando disso.
+
+[07:33] E eu tenho um algoritmo bem mais simplificado, tanto neste ponto onde eu não lanço mais exceções, quanto no ponto onde eu uso e não preciso mais fazer um try catch e deixar o catch vazio, ou adicionar algum log. E, claro, se eu quisesse fazer um log aqui no caso de não ter nada, eu ainda posso. Eu tenho a opção de pegar um valor ou executar um callback.
+
+[07:58] Então eu pego um valor, se esse valor existir, senão, eu faço um log aqui dentro, isso também é possível. Mas não vou fazer isso, porque exatamente essa não é a minha intenção, é não fazer o log. Mais um algoritmo simplificado, agora eu acredito que esse método está bem mais legível.
+
+[08:12] De novo, ele cabe em uma tela só, até quando determinada folga, toda a implementação dele. Sempre dá para melhorar, então temos que cuidar para não ficar em uma refatoração infinita.
+
+[08:25] Só que existem outros detalhes que ainda me incomodam. Por exemplo, vamos dar uma olhada no nosso proxy. Ele é responsável por buscar uma resposta HTTP e por fazer um parse de uma URL. São coisas muito diferentes na mesma interface, no mesmo tipo, com a mesma responsabilidade, então isso está me incomodando bastante, eu acho que está na hora de atacarmos esse problema, mas no próximo capítulo.
+
+@@07
+Para saber mais: Referências
+
+Diversas referências foram citadas neste vídeo, então vou deixar alguns links aqui para você complementar seus estudos:
+Nova sintaxe no construtor do PHP 8: https://www.youtube.com/watch?v=XJCSQ2nWRrQ
+O que são mônadas: https://www.youtube.com/watch?v=1FdK8adSo4Y
+Short closures PHP: https://cursos.alura.com.br/novidades-do-php-7-4-arrow-functions-c130
+Exceções como controle de fluxo: https://wiki.c2.com/?DontUseExceptionsForFlowControl
+
+https://www.youtube.com/watch?v=XJCSQ2nWRrQ
+
+https://www.youtube.com/watch?v=1FdK8adSo4Y
+
+@@08
+Faça como eu fiz
+
+Chegou a hora de você seguir todos os passos realizados por mim durante esta aula. Caso já tenha feito, excelente. Se ainda não, é importante que você execute o que foi visto nos vídeos para poder continuar com a próxima aula.
+
+Continue com os seus estudos, e se houver dúvidas, não hesite em recorrer ao nosso fórum!
+
+@@09
+O que aprendemos?
+
+Nesta aula:
+Vimos que não devemos sobrescrever parâmetros
+Aprendemos a extrair o que é chamado de objeto-método
+Conhecemos um conceito de programação funcional
+Substituímos o algoritmo de um método
