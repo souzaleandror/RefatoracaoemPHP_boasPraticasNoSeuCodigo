@@ -716,3 +716,235 @@ Vimos que não devemos sobrescrever parâmetros
 Aprendemos a extrair o que é chamado de objeto-método
 Conhecemos um conceito de programação funcional
 Substituímos o algoritmo de um método
+
+#### 15/02/2024
+
+@05-Extraindo classes
+
+@@01
+Projeto da aula anterior
+
+Caso queira, você pode baixar aqui o projeto do curso no ponto em que paramos na aula anterior.
+
+https://github.com/alura-cursos/google-crawler/archive/refs/tags/aula-4.zip
+
+@@02
+Extrair classes
+
+[00:00] E aí, pessoal? Bem-vindos de volta a mais um capítulo deste treinamento, onde estamos fazendo algumas refatorações bem interessantes em códigos reais. Vamos lá, eu quero agora modificar essa GoogleProxyInterface. Ela não está legal porque ela é uma interface que faz muita coisa, é uma interface que nos obriga a saber realizar uma requisição HTTP e devolver a resposta.
+[00:22] E é uma interface que nos obriga a saber parsear uma URL. Então eu quero separar esses dois. Deixa eu abrir o menu lateral, vamos ver onde eu vou organizar isso. Aqui em "Proxy", eu tenho - opa, eu cliquei em alguma coisa que eu não deveria ter clicado, mas tudo bem. Eu terei "HttpClient", um cliente HTTP que vai fazer o que tem que fazer, seja lá como ele vai realizar essas chamadas.
+
+[00:48] E o URL parse. Então novo diretório, "UrlParse". Então cada proxy terá uma implementação de um cliente HTTP e de um parseador de URL. Eu terei uma interface no "HttpClient", vamos lá, será "GoogleHttpClient", ou alguma coisa do tipo, você pode pensar em um nome melhor. O que essa interface terá é esse método aqui.
+
+[01:14] Vamos lá, tem esse método aqui. Então ela espera uma string, que é uma URL, e devolva uma resposta da PSR. Caso você não saiba o que é uma PSR, no treinamento de MVC nós falamos bastante sobre esse assunto. Mas vamos lá, continuando, eu terei aqui uma "GoogleUrlParser", que também é uma interface. Nessa interface eu terei esse método aqui.
+
+[01:46] Para quem conhece os princípios solid, o que eu estou fazendo é basicamente aplicar aquele inner face aggregation principle, o princípio I. Se você não conhece solid tudo bem, mas fica a dica para você estudar, que é um assunto muito interessante. Perfeito, deixa eu remover isso, onde está o delete? Aqui.
+
+[02:06] Ou poderia copiar aquela documentação, que eu acho que é interessante, mas vou deixar para lá. Então, agora eu quero implementar pelo menos esse de "NoProxy". Vamos lá, "NoProxyGoogleHttpClient". Eu vou pegar a implementação do "NoProxy", que vai pegar a resposta HTTP. Vamos lá, vou copiar isso. Vou colar na nova classe, ok. Aqui eu implemento um http client, um GoogleHttpClient. Perfeito.
+
+[02:44] De novo, existe uma forma melhor de fazer isso, eu não deveria criar esse cliente aqui diretamente, mas sim recebendo ele por parâmetro aqui, eu deveria receber uma ClientInterface aqui, esse é o ideal.
+
+[02:57] Mas, eu não vou fazer isso para não alterar coisa demais. Vou deixar inclusive isso de desafio para você, para que você implemente desta forma, com injeção de dependência. “Vinicius, não sei o que é injeção de dependência”. Também tem vídeo aqui na Alura+ falando sobre isso, dê uma olhada lá, a Alura+ está cheia de conteúdo legal.
+
+[03:13] Mas, continuando, vamos criar agora o nosso "NoProxyGoogleUrlParser". Perfeito, ele implementa, obviamente, o class NoProxyGoogleUrlParser implements GoogleUrlParser- deixa eu tirar isso daqui, tirar isso daqui e vou remover daqui essa implementação.
+
+[03:36] Eu posso, inclusive, apagar esse "NoProxy", apagar essa classe - cadê o "Delete"? Pronto, classe jogada fora. Vamos nessa e adicionar a implementação. Vou importar o que tem que importar, no caso é uma exceção, perfeito. Vamos ver do que ele está reclamando, deixa eu ver aqui, o "GoogleUrlParser", eu copiei a coisa errada.
+
+[04:01] Agora me complicou um pouco. Vamos lá, eu sei que aqui é essa interface, eu copiei aqui para o "UrlParser" a implementação errada, a interface errada. Eu vou apagar isso, sem problema, não precisamos nos preocupar.
+
+[04:17] Então perfeito, tenho agora as coisas separadas e eu preciso que o meu crawler receba, ao invés de um proxy, que não faz mais sentido receber isso, ele vai receber um parser, então Google, primeiro o client - pode ser o GoogleUrlParser, e o GoogleHttpClient. Então eu quero receber esses dois. Vamos lá, vou inicializar isso aqui direto, não vou mais ter esse padrão.
+
+[04:50] Dessa forma, eu preciso modificar todos os lugares que fazem requisição, que fazem esse tipo de coisa, para utilizar o nosso httpClient, nesse cenário, aqui ele vai passar direto o urlParser, se eu não me engano, o nosso parser. E aqui ele precisa receber, obviamente, um public function __construct(private GoogleUrlParser $proxy). Deixa eu ver se nada quebrou.
+
+[05:12] Perfeito, teoricamente tudo funcionando. Só que agora nossos testes não passam esses dois objetos novos, eles não passam esses dois, por parâmetro, então nossos testes vão quebrar. Só que o que eu fiz? Vamos recapitular, vamos focar aqui no ponto da refatoração.
+
+[05:32] Eu peguei um código que estava em um lugar só, naquele nosso "NoProxy" e extrai esse código que não fazia sentido estar lá, por causa de muitas responsabilidades, eu extrai para uma classe específica. Eu realizei esse processo duas vezes, então do "NoProxy" eu extrai uma classe "NoProxyGoogleHttpClient" e extrai uma outra classe, "NoProxyGoogleUrlParser".
+
+[05:55] Essa extração de classes é uma refatoração muito comum. Quando temos um pedaço de código que parece não pertencer àquele local, nós extraímos para uma classe diferente. Muito semelhante ao que fizemos em "DomElementParser".
+
+[06:09] Nesse caso, nós extraímos algo específico, que é uma chamada de método, e nós extraímos, então essa é o nome, no catálogo de refatorações, essa ideia é um pouco diferente, mas extração de classes um pouco mais genéricas também é uma refatoração muito comum. Só que, de novo, voltando ao nosso código, eu não quero receber esses dois parâmetros.
+
+[06:30] Eu quero simplificar um pouco a criação do meu construtor, a criação desse meu objeto no construtor. No próximo vídeo nós vamos implementar um padrão de projeto que é bastante mal compreendido, inclusive tem vídeos, tem cursos de padrão de projetos aqui, na Alura, nós aprendemos, estudamos sobre ele, e agora vamos ver isso, na prática.
+
+@@03
+Por que 2?
+
+Neste vídeo nós separamos as interfaces de Cliente HTTP e Parser de URL em 2 interfaces específicas.
+Por que separar as responsabilidades em interfaces diferentes?
+
+Porque assim podemos ter classes específicas para realizar cada tarefa
+ 
+Alternativa correta! Com esta refatoração nós passamos a aderir os princípios S e I de SOLID. Nós separamos as interfaces (I) e fizemos com que cada classe tivesse uma responsabilidade mais bem definida (S).
+Alternativa correta
+Porque com mais interfaces, nossas classes podem performar melhor
+ 
+Alternativa correta
+Porque quanto mais interfaces no projeto, melhor
+
+@@04
+Abstract factory
+
+[00:00] E aí, pessoal? Bem-vindos de volta. Eu queria bater um papo bem rápido, super resumido, sobre o que fizemos no último vídeo, porque extrair uma classe é uma tarefa bastante comum, mas pode ser feita de várias formas. Como nós vimos naquele cenário, nós pegamos uma classe e transformamos em duas.
+[00:15] Mas, uma outra forma muito comum de aplicar essa extrair classe, essa refatoração de extrair classe, é nesse cenário exemplificado aqui. Imagine que eu tenho uma classe Pessoa, ela tem um nome, tem um código de área do escritório, tem um número do escritório, e tem como buscar o número do telefone.
+
+[00:34] Então tem algumas coisas aqui, nessa pessoa, e vemos que algumas coisas não encaixam, não parecem fazer parte da pessoa em si. Então extraímos uma nova classe, por exemplo, número de telefone e então temos o código de área e o número, e faz muito mais sentido nesse cenário.
+
+[00:49] então extrair classe, nós podemos usar em alguns contextos. Quando algo parece que não faz sentido estar naquela classe, nós extraímos para uma classe diferente e podemos usar essa implementação de formas diferentes também. Aqui, neste cenário, quando eu extrai uma classe, Pessoa passa a ter um número de telefone, então temos uma associação. Já no cenário que nós aplicamos, a classe original deixou de existir para dar lugar a essas duas novas.
+
+[01:16] Mas, vamos lá, o que vamos implementar agora é o que é conhecido como abstract factory, ou seja, uma fábrica abstrata. O que vamos fazer é criar uma interface que permite a criação de parser e de cliente HTTP, ambos para o Google, óbvio. E teremos uma implementação de no proxy factory, teremos uma k proxy factory, common proxy factory e etc.
+
+[01:41] Então vamos lá, eu posso criar um novo namespace para fábricas, mas eu vou deixar na raiz mesmo. "ProxyFactory", ou melhor ainda, "ProxyAbstractFactory". Nós podemos pensar em um nome melhor, para não usar o nome do padrão de projeto na classe, mas tudo bem, isso não vai atrapalhar em nada aqui.
+
+[02:01] Como eu comentei, nós estudamos esse padrão de projeto no treinamento de padrões de projetos, mas se você não fez esse treinamento, não se preocupe, que você vai entender o que eu vou fazer. Eu vou criar aqui a minha interface, que diz que eu consigo criar public function createGoogleHttpClient():.
+
+[02:23] Isso nos retorna um : GoogleHttpClient. Eu também posso criar, então public function createGoogleUrlParser():. Isso vai retornar, obviamente, um : GoogleUrlParser. Simples assim. Aqui eu vou renomear para GoogleProxyAbstractFactory, acho que fica um pouco mais interessante
+
+[02:45] Agora vamos para as implementações. Eu terei aqui o nosso "NoProxyAbstractFactory", porque essa fábrica, ela sabe criar algumas coisas. Vamos lá, implement GoogleProxyAbstractFactory. E o que temos que implementar? Esses dois métodos.
+
+[03:09] Então um será simplesmente retornar o nosso return new NoProxyGoogleHttpClient(). De novo, se estivéssemos recebendo o cliente HTTP, aquele do goose ou aqui, por parâmetro, eu simplesmente passaria o cliente aqui. Mas, continuando, vamos ver qual é o problema aqui. Não é problema nenhum. Eu posso retornar return new NoProxyGoogleUrlParser. Eu criei aqui a minha fábrica abstrata de sem proxy nenhum.
+
+[03:43] Agora, o que eu posso receber no nosso crawler, ao invés de receber esses dois, eu vou receber, na verdade, uma GoogleProxyAbstractFactory. Inclusive eu posso voltar com aquela nossa regra de permitir que isso seja nulo. Então vamos criar aqui um private googleHttpClient $httpClient.
+
+[04:10] E teremos um private GoogleUrlParser $urlParser;. Aqui vamos criar se if ($factory === null) eu vou criar de uma forma, senão, eu vou simplesmente usar a factory.
+
+[04:32] Então vamos lá, o nosso $this->httpClient = $factory->createGoogleHttpClient(), e o nosso $this->urlParser será o da factory também, = $factory->createUrlParser(). Caso contrário, eu posso eu mesmo criar. Ou melhor ainda, olha só, eu posso dizer que $factory = new NoProxyAbstractFactory() e eu não preciso adicionar mais nada, eu posso utilizar direto aqui.
+
+[04:55] Nós já temos os nossos objetos inicializados. Teoricamente precisamos alterar menos testes agora. Vamos ver, sim, aqui eu utilizei errado, http client e aqui é url parser.
+
+[05:13] Teoricamente o nosso código não tem mais problemas, vamos ver. Posso remover essas dependências antigas aqui, que eu não estou mais usando. Vamos lá. Aqui deixa eu quebrar aqui, tirar aqui, quebrar essa linha para ficar um pouco mais claro, e para ficar um pouco mais claro.
+
+[05:31] Na verdade, para melhorar mais ainda, todos esses namespaces agrupados, eu prefiro separar eles, eu acho que vai ficar um pouco melhor, um pouco mais claro, no máximo eu poderia agrupar tudo o que está aqui em proxy, mas eu acho que não vale a pena.
+
+[05:45] Continuando, só falta atualizarmos os nossos testes. Mas vamos recapitular o que eu fiz: eu tinha uma classe que fazia requisições HTTP e realizava o parse de uma URL. Ela tinha muita responsabilidade e eu extraí para duas classes diferentes, a que faz requisições HTTP e a que faz o parse de URL.
+
+[06:05] Para que eu não precise ficar recebendo vários parâmetros por argumento, sendo que esses parâmetros estão diretamente relacionados, não faz sentido eu realizar uma requisição HTTP com o cliente do common proxy e tentar fazer o parse da URL com o no proxy. Isso não funcionaria. Então, eu criei uma abstract factory para criar esses objetos de forma agrupada, a partir de um local único.
+
+[06:26] Agora, o que vamos fazer é alterar nossos testes. De novos, vamos deixar aqueles testes que usam proxies de lado, mas eu deixo de novo mais um desafio para você: também criar uma fábrica desse common proxy, para conseguirmos continuar com aqueles testes. Mas eu não vou fazer aqui, eu vou utilizar somente - vamos no nosso default crawler.
+
+[06:49] Esse commonProxy eu vou marcar como pulado também, eu vou pular esse teste aqui, 'Implementation outdated', e vou atualizar esse de cima. O nosso $crawler = ner Crawler();, como ele continua com o parâmetro podemos ser nulo, eu vou deixar esse parâmetro nulo e estamos felizes.
+
+[07:04] Aqui, se eu não me engano, não tenho mais nenhum teste que seja realmente executado. Vamos dar uma olhada no próximo.
+
+[07:11] Esse eu não vou passar mais o NoProxy, eu vou passar o NoProxyAbstractFactory(), e isso, como nós já vimos, não é aqui que usamos, não sei nem o porquê eu deixei de atualizar isso, não sei o que aconteceu nesse cenário. Acho que nem estávamos utilizando esses testes. Mas vamos lá, eu vou receber aqui, no local correto. Agora sim. Vou quebrar a linha, para ficar um pouco melhor, para ficar um pouco melhor e para ficar um pouco melhor. Agora sim.
+
+[07:41] Aqui embaixo a mesma coisa, vamos lá, aqui não recebe mais um proxy, isso recebe um NoProxyAbstractFactory.
+
+[07:50] Teoricamente tudo certo, deixa eu garantir que eu não preciso remover nenhuma importação aqui, essa. Teoricamente já atualizamos esse teste. Vamos ver se temos algum teste de unidade? Temos esses aqui, podemos simplesmente marcar esses markTestSkipped('Implementation outdated'). Então a implementação está desatualizada, não vamos rodar esses testes mais.
+
+[08:16] Vamos deixar eles para depois. Eu deixo vocês corrigirem eles, se for o caso, ou caso vocês queiram. Vamos continuar. Teoricamente, acredito que temos tudo certo. Aqui um detalhe importante, isso é o principal, os testes de unidade.
+
+[08:34] NoProxyAbstractFactory, vamos lá, em todo lugar que estiver criando isso eu vou passar o NoProxyAbstractFactory. Vamos ver se aqui precisamos criar alguma coisa, aqui um proxy. Aqui nós temos um mock.
+
+[08:52] Nós temos um dublê de teste. Se você não entender o que eu vou fazer aqui, não tem problema, nós temos um treinamento de testes, mas eu vou atualizar esse teste para garantir que ele vai continuar passando. Vamos lá, eu vou criar aqui um GoogleHttpClient e é isso que ele vai retornar.
+
+[09:10] Teoricamente é isso, vamos alterar para $googleHttpClient. Eu vou criar também um proxy. Deixa ver, se eu preciso daquele parse URL, acho que não. A princípio é isso.
+
+[09:28] Posso então criar aqui uma $factoryMock = $this->createStub() de abstract factory e eu vou dizer que o método method()- qual é o nome daquele método? O método que temos na interface, que retorna, que cria, na verdade, o nosso cliente HTTP, é esse aqui. Então esse método vai retornar, return, aquele nosso --willReturn($googleHttpClient).
+
+[10:05] O que eu estou fazendo aqui, eu estou criando essa fábrica de mentiras para passar aqui no nosso teste, então $factoryMock, para que nesse teste aconteça o que tem que acontecer. No caso, lançar uma exceção de resultado inválido, esse HTML está inválido.
+
+[10:19] Vamos ver onde isso é lançado. Isso é lançado no cenário quando tentamos criar o nosso resultado e não tem nenhum resultado para ser encontrado, então entendemos que nenhum elemento foi parseado. Teoricamente os nossos testes estão atualizados. Se eu não dei nenhuma bobeira, tudo deve funcionar.
+
+[10:41] Vamos lá, mais testes pulados, e temos alguns erros aqui. Eu vou finalizar esse vídeo aqui, que já está longo, corrigir esses erros e voltar com a solução para você, bem explicada, para você não ficar me assistindo buscar esses erros.
+
+@@05
+Padrão de projeto
+
+Neste vídeo nós implementamos o padrão de projeto Abstract Factory.
+Qual o propósito de uma fábrica abstrata, segundo este padrão de projeto?
+
+Criar objetos vindos de classes abstratas
+ 
+Alternativa correta
+Criar objetos diretamente relacionados
+ 
+Alternativa correta! Uma fábrica abstrata no nosso caso sabe criar um cliente HTTP que acessa o google e uma classe que faz o parse de URLs do Google.
+Alternativa correta
+O mesmo que um factory method: criar objetos
+
+@@06
+Extra: Outras técnias
+
+[00:00] E aí, pessoal? Bem-vindos de volta. Muito provavelmente você percebeu antes de mim alguns detalhes. O primeiro é que aqui, a nossa interface de Google Http client, ela não tinha o método, eu não coloquei, eu fiz uma confusão e não adicionei esse método. Aqui estava o problema, por isso eu estava recebendo um aviso da IDE, que eu estava achando confuso, mas resolvi ignorar.
+[00:20] Está aqui o problema. O outro detalhe é que eu estava colocando isso tudo em uma linha só. Com o PHP Storm, como já vimos, tanto no treinamento de testes quanto no vídeo aqui na Alura+ sobre dublês de teste, sobre como criar dublês sem expectativas, tem um vídeo na Alura+, nós precisamos primeiro criar o dublê e com o dublê criado, nós podemos configurar ele.
+
+[00:43] Se eu tento configurar tudo na mesma linha, o que terá na variável é o retorno desse método, que não é o dublê. Foi uma confusão que eu fiz, mas aqui, vou até rodar de novo para você ver comigo, todos os testes agora passam.
+
+[00:56] Então o que fizemos neste último vídeo, para recapitular, foi pegar uma classe - nesse último capítulo, na verdade - pegar uma classe de proxy e extrair uma outra classe, que faz requisições HTTP, e separar a responsabilidade. Depois pegamos o método que faz o parse de URL e extraímos para um outro local também. Então podemos até excluir a classe original.
+
+[01:16] Mas, o foco da refatoração foi aquilo que eu te mostrei naquela imagem, de refatorar para: eu tenho uma classe, tenho alguns métodos que parecem fora de lugar, que podem ser extraídos, então eu extraio para uma classe separada. Inclusive, nos nossos treinamentos básicos de orientação a objetos, nós fizemos isso, extraindo o CPF, por exemplo, extraindo o endereço do nosso titular.
+
+[01:37] Nós fizemos esses trabalhos, onde tínhamos determinadas informações, que talvez não devessem estar lá, e extraímos para classes específicas. Com isso, nós já modificamos bastante - aqui, só para você ver, o teste que eu tive que corrigir foi esse aqui, onde tentávamos lançar uma exceção.
+
+[01:55] Mas ok. E aqui, o que temos de resultado final é um desafio para que você faça essa implementação aqui igual fizemos do “NoProxy” faça com “CommonProxy”também e o que eu acredito que ele, igual fizemos a do "NoProxy", que você faça com o "CommonProxy" também. E o "KProxy", eu acredito que ele já nem funcione mais, mas, caso você queira praticar, também é uma boa de implementar.
+
+[02:13] Com isso, descomente aqueles testes, tire aquele método que marca eles como incompletos, deixa eu mostrar para vocês os testes que eu marquei como incompletos. Aqui, nesses personalizados, eu marquei o teste como pulado, na verdade, para pular esse teste, porque esse teste está desatualizado, então o código não está correto. Quando chamamos esse método do PHPUnit, ele nem executa esse método, ele vê essa linha e fala: vou sair daqui, então, nem executo. Então fica o desafio para você fazer essas implementações.
+
+[02:50] E eu quero deixar uma referência bastante interessante para você. Nesse site, o "refactoring.guru", esse site, ele tem muita coisa interessante, nos treinamentos de padrões de projeto nós andamos bastante por ele. Ele também tem uma seção de refatoração.
+
+[03:07] Ele tem aqui bastante coisa do que já falamos, sobre o que é refatoração, vale a pena a leitura, o que é dívida técnica, quando e como refatorar. Só que em alguns momentos eu falei de um catálogo de refatoração. Esse catálogo de refatoração vem de um livro muito famoso, “Refactoring”, e esse livro, ele provê para nós exatamente isso, um catálogo, onde nós temos um problema e esse problema é visto como code smell.
+
+[03:31] Nós temos uma forma de refatorar, que é através das refactoring techniques ou técnicas de refatoração. Com isso, esse site montou esse catálogo para nós.
+
+[03:41] Ele explica o que é um code smell e ele mostra vários desses code smells, o que é uma técnica e ele mostra várias dessas técnicas, separadas por categoria. E, neste treinamento, nós vimos algumas dessas. Só que repare que são muitas, e se eu fosse passar técnica por técnica, te explicando todas, eu precisaria criar mais problemas do que um projeto real tem.
+
+[04:04] Eu precisaria ou trazer um projeto muito grande, então iríamos encontrar isso tudo, ou ficar criando problemas e acho que não ia ficar tão legal. Então a ideia por trás das refatorações foi isso que vimos neste treinamento. Existem muitas técnicas que valem a pena conferir. Esse site é bastante didático, então vou deixar no Para Saber Mais. Como já utilizamos ele em outros treinamentos, eu acho que fica legal dar uma olhada nele.
+
+[04:29] Só para você entender, de novo, aqui nós temos os codes smells, que eles também estão separados por categoria, então códigos que deixam o nosso código muito inchado, abusadores da orientação a objetos, algumas coisas que acabam nos impedindo de fazer mudanças, que dificultam mudanças, coisas que são dispensáveis, enfim, acopladores, tem categorias.
+
+[04:57] Dentro de cada uma dessas categorias nós temos vários code smells, vários problemas. Cada um desses problemas tem algumas soluções, que são essas técnicas de refatoração. Nós vimos alguns desses, de extrair método, fazer o inline de método, extrair variável, adicionar uma variável, fazer o inline de uma variável temporária.
+
+[05:17] Tem bastante coisa interessante, são coisas bem pequenas, deixa eu clicar em qualquer um aqui. Esse nós não vimos, “Feature Envy”.
+
+[05:24] Tem os sinais e sintomas, e ele mostra uma imagem ilustrativa, tem a descrição bem rápida e tem o tratamento, ou seja, quais refatorações podemos utilizar. A partir disso ele mostra vantagem e desvantagem e, inclusive, algumas dessas techniques, alguma dessas técnicas, por exemplo, mover método, elas mostram aqui em imagens a forma de implementação.
+
+[05:47] E algumas delas tem até um código de exemplo, você consegue ver em diversas linguagens, então vale a pena conferir. Para quem prefere leitura mais formal, eu vou deixar no Para Saber Mais o link do livro, porque o livro que originou esse catálogo, e é bastante extenso.
+
+[06:03] Eu confesso que eu achei ele um pouco maçante na época que eu li, eu li já tem alguns anos, então eu achei ele um pouco cansativo de ler, por isso eu estou apresentando como a primeira referência esse site, que é bem mais dinâmico, ele é bem mais didático, mais interativo. Mas o livro ainda é a referência oficial,
+
+[06:22] Então eu vou deixar o link no Para Saber Mais, caso você se interesse, recomendo, que é uma leitura válida, embora seja um pouco maçante, pelo menos na minha opinião. Enfim, já estou me alongando demais, essa foi toda a ideia por trás da refatoração, e no próximo vídeo eu venho para fazer aquela conclusão e dar aquele abraço.
+
+@@07
+Para saber mais: Referências
+
+Nós vimos durante o treinamento diversas técnicas de refatoração, mas isso é só o começo. Existem inúmeras outras técnicas para tornarmos nosso código melhor.
+Se você quiser se aprofundar nos conceitos, pode ler o livro considerado oficial que apresenta esse catálogo de refatorações: https://amzn.to/3m32rBC
+
+Caso prefira um conteúdo um pouco mais interativo, este site é muito interessante: https://refactoring.guru/refactoring/
+
+@@08
+Faça como eu fiz
+
+Chegou a hora de você seguir todos os passos realizados por mim durante esta aula. Caso já tenha feito, excelente. Se ainda não, é importante que você execute o que foi visto nos vídeos para poder continuar com os próximos cursos que tenham este como pré-requisito.
+
+Continue com os seus estudos, e se houver dúvidas, não hesite em recorrer ao nosso fórum!
+
+@@09
+Projeto final do curso
+
+Caso queira, você pode baixar aqui o projeto completo implementado neste curso.
+
+https://github.com/alura-cursos/google-crawler/archive/refs/tags/aula-5.zip
+
+@@10
+O que aprendemos?
+
+Nesta aula:
+Aplicamos o princípio I de SOLID
+Extraímos classes mais coesas
+Aplicamos o padrão Abstract Factory
+Conhecemos as referências sobre refatoração
+
+@@11
+Conclusão
+
+[00:00] E aí, pessoal? Parabéns por chegarem ao final deste treinamento, onde vimos algumas técnicas de refatoração com PHP. Refatoração é um assunto muito extenso, nós só molhamos o nosso pé nesse oceano. Para trabalharmos um pouco com refatoração, nós usamos um projeto real, que inclusive está até descontinuado, ou seja, é um projeto relativamente antigo, e por isso tínhamos bastante coisa que podia melhorar.
+[00:26] A partir desse projeto nós vimos algumas técnicas muito interessante, como extrair ou fazer inline de variáveis, extrair ou fazer inline de métodos, quando utilizar variáveis temporárias ou não, quando utilizar métodos e quando utilizar variáveis, extrair classes, substituir algoritmos. Inclusive aplicamos padrões de projeto, falamos sobre solid.
+
+[00:47] Quando estudamos esse tipo de coisa, nós vemos a real necessidade de conhecer alguns padrões de projeto, mesmo que você não conheça todos, que você já tenha ouvido falar, saiba mais ou menos para que serve, a real importância de conhecer solid, porque mesmo em um projeto que não esteja com o melhor código do mundo, nós conseguimos aplicar as técnicas e melhorar, nem que seja um pouco a legibilidade, a facilidade de testar.
+
+[01:11] Inclusive vimos a importância de testes na hora de realizar refatorações, principalmente no início, quando começamos a refatorar, alguns testes começaram a quebrar, nós íamos, arrumávamos o código. E vimos que se mudamos muito o nosso código, nós temos um trabalho extra de mudar os nossos testes também, mudar, obviamente, o código de produção que usa esse nosso código.
+
+[01:32] Então precisamos sempre botar na balança quando vale a pena e quanto vale a pena refatorar. Mas, enfim, se em alguma parte desse processo, que eu sei que foi um curso não tão fácil assim, se em alguma parte dele ficou alguma dúvida, algo não ficou claro, não hesite, abra uma dúvida no fórum, que eu vou ficar mais do que feliz em te ajudar.
+
+[01:52] Eu tento responder pessoalmente, sempre que possível, mas às vezes, quando eu não consigo responder a tempo, temos uma comunidade incrível de alunos, moderadores e instrutores, alguém com certeza vai conseguir te ajudar. Enfim, mais uma vez parabéns por ter chegado até o final, espero que você tenha aproveitado bastante e espero te ver em outros conteúdos aqui na Alura. Um forte abraço, tchau.
